@@ -1,4 +1,4 @@
-const { ValidationError } = require("./errorHandler");
+const { ValidationError } = require('./errorhandler.middlewares');
 
 const validateStringInput = (req, res, next) => {
 	const { value } = req.body;

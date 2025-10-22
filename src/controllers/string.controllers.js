@@ -1,11 +1,11 @@
 const crypto = require("crypto");
-const { StringModel } = require("../models");
+const { StringModel } = require('../models/string.models');
 const {
 	asyncHandler,
 	NotFoundError,
 	ConflictError,
 	ValidationError,
-} = require("../middleware/errorHandler");
+} = require('../middlewares/errorhandler.middlewares');
 
 // String analysis functions
 const analyzeString = (inputString) => {

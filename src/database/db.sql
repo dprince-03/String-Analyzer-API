@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS strings(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-CREATE INDEX IF NOT EXISTS idx_string_value_prefix ON analyzed_strings (value(100));
-CREATE INDEX IF NOT EXISTS idx_unique_chars ON analyzed_strings (unique_characters);
-CREATE INDEX IF NOT EXISTS idx_character_frequency ON analyzed_strings ((JSON_KEYS(character_frequency_map)));
+CREATE INDEX IF NOT EXISTS idx_string_value_prefix ON strings (value(100));
+CREATE INDEX IF NOT EXISTS idx_unique_chars ON strings (unique_characters);
+CREATE INDEX IF NOT EXISTS idx_character_frequency ON strings ((JSON_KEYS(character_frequency_map)));
 
 -- Statistics view
 CREATE VIEW string_statistics AS
@@ -38,4 +38,4 @@ SELECT
     SUM(is_palindrome) as total_palindromes,
     AVG(word_count) as average_word_count,
     MAX(created_at) as last_analysis
-FROM analyzed_strings;
+FROM strings;
