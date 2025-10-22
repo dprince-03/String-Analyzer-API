@@ -9,7 +9,7 @@ class AppError extends Error {
     };
 };
 
-class ValidatorError extends AppError {
+class ValidationError extends AppError {
     constructor (message) {
         super(message, 400);
         this.name = 'ValidatorError';
@@ -23,6 +23,13 @@ class NotFoundError extends AppError {
     };
 };
 
+class ConflictError extends AppError {
+    constructor (message) {
+        super(message, 409);
+        this.name = "ConflictError";
+    };
+};
+
 const errorHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
@@ -30,11 +37,32 @@ const errorHandler = (err, req, res, next) => {
     console.error('Error: ', {
         message: err.message,
         stack: err.stack,
-        url: err.originalUrl,
-        method: err.method,
-        ip: err.ip,
+        url: req.originalUrl,
+        method: req.method,
+        ip: req.ip,
         timestamp: new Date().toISOString(),
     });
+
+    if (process.env.NODE_ENV === 'development') {
+        res.status(err.statusCode).json({
+            status: err.status,
+            error: err,
+            message: err.message,
+            stack: err.stack
+        });
+    } else {
+        if (err.isOperational) {
+            res.status(err.statusCode).json({
+                status: err.status,
+                message: err.message
+            });
+        } else {
+            res.status(500).json({
+                status: 'error',
+                message: 'Something went wrong!'
+            });
+        }
+    }
 };
 
 const asyncHandler = (fn) => (req, res, next) => {
@@ -47,8 +75,9 @@ const notFoundHandler = (req, res, next) => {
 
 module.exports = {
     AppError,
-    ValidatorError,
+    ValidationError,
     NotFoundError,
+    ConflictError,
     errorHandler,
     asyncHandler,
     notFoundHandler,

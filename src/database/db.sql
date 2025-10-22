@@ -20,16 +20,11 @@ CREATE TABLE IF NOT EXISTS strings(
     INDEX idx_length (length),
     INDEX idx_word_count (word_count),
     INDEX idx_created_at (created_at),
-    INDEX idx_value_prefix (value(100)),
+    INDEX idx_value_prefix (value(100))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-CREATE INDEX IF NOT EXISTS idx_string_value_prefix ON strings (value(100));
-CREATE INDEX IF NOT EXISTS idx_unique_chars ON strings (unique_characters);
-CREATE INDEX IF NOT EXISTS idx_character_frequency ON strings ((JSON_KEYS(character_frequency_map)));
-
 -- Statistics view
-CREATE VIEW string_statistics AS
+CREATE OR REPLACE VIEW string_statistics AS
 SELECT 
     COUNT(*) as total_strings,
     AVG(length) as average_length,

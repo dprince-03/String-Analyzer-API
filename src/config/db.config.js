@@ -2,14 +2,15 @@ require('dotenv').config();
 const mysql = require('mysql2/promise');
 
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'string_analyzer',
-    port: process.env.DB_PORT || 3306,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
+	host: process.env.DB_HOST || "localhost",
+	user: process.env.DB_USER || "root",
+	password: process.env.DB_PASSWORD || "",
+	database: process.env.DB_NAME || "string_analyzer_db",
+	port: process.env.DB_PORT || 3306,
+	waitForConnections: true,
+	connectionLimit: 10,
+	queueLimit: 0,
+	charset: "utf8mb4",
 };
 
 const pool = mysql.createPool(dbConfig);
@@ -20,7 +21,7 @@ const testConnection = async () => {
         console.log('   ...Database connected successfully...   ');
 
         const [rows] = await connection.execute("SELECT 1 as test");
-		console.log(`   ...Database query test successful: ${rows[0]}...    `);
+		console.log(`   ...Database query test successful: ${rows[0].test}...    `);
 
         connection.release();
         return true;
@@ -42,6 +43,7 @@ const closeConnection = async () => {
 };
 
 module.exports = {
+    pool,
     testConnection,
     closeConnection,
 };

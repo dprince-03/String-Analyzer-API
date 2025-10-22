@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-// const session = require('express-session');
+// const session = require('express-session'); finish task then comeback to this 
 const compression = require('compression');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -17,20 +17,16 @@ const PORT = process.env.PORT || 5080;
 // ====================
 //    Middlewares
 // ====================
+const limit = rateLimit({
+    windowMs: 15 + 60 * 1000, // 15 minutes
+    max: 100,
+    message: "Too many requests from this IP, please try again after 15 minutes",
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
-    contentSecurityPolicy: {
-		directives: {
-			defaultSrc: ["'self'"],
-			styleSrce: ["'self'", "https:", "'unsafe-inline'"],
-			scriptSrc: ["'self'", "https:", "'unsafe-inline'"],
-			imgSrc: ["'self'", "data:", "https:"],
-			connectSrc: ["'self'", "https:"],
-			fontSrc: ["'self'", "https:", "data:"],
-			objectSrc: ["'none'"],
-			upgradeInsecureRequests: [],
-		},
-	},
 }));
 app.use(cors({
     origin: '*',
@@ -41,8 +37,19 @@ app.use(cors({
 }));
 app.use(compression());
 app.use(morgan('dev'));
-app.use(express.json({ limits: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+app.use((err, req, res, next) => {
+	if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+		return res.status(400).json({
+			status: "fail",
+			message: "Invalid JSON format",
+		});
+	}
+	next(err);
+});
+
 // app.use(session({
 //     secret: process.env.SESSION_SECRET || "your_session_secret",
 // 	resave: false,
@@ -52,14 +59,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // 		httpOnly: true,
 // 		maxAge: 24 * 60 * 60 * 1000, // 24 hours
 // 	},
-// })); // if making it an available api
-app.use(rateLimit({
-    windowMs: 15 + 60 * 1000, // 15 minutes
-    max: 100,
-    message: "Too many requests from this IP, please try again after 15 minutes",
-    standardHeaders: true,
-    legacyHeaders: false,
-}));
+// })); // if making it an available api for people to use or when making it a website or whatever
+// app.use();
+
 // Security headers middleware
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -80,14 +82,14 @@ app.use((req, res, next) => {
 // ====================
 //      Routes
 // ====================
-app.use('/api', rateLimit);
+app.use('/api', limit);
 app.use('/api', stringRouter);
 
 // ====================
 //    Error Handler
 // ====================
-app.use(errorHandler);
 app.use(notFoundHandler);
+app.use(errorHandler);
 
 // ====================
 //      Server 
@@ -100,12 +102,12 @@ const startServer = async () => {
         }
 
         const server = app.listen(PORT, () => {
-            console.log(`...Api URL: http://localhost:${PORT}/api...`);
-            console.log(`...Press Ctrl C to exit or stop server...`);
+            console.log(`   ...Api URL: http://localhost:${PORT}/api... `);
+            console.log(`   ...Press Ctrl C to exit or stop server...   `);
         });
 
         const shutdown = async (signal) => {
-            console.log(`...${signal} received. Shutting down gracefully...`);
+            console.log(`   ...${signal} received. Shutting down gracefully...  `);
 
             server.close(async () => {
                 await closeConnection();
@@ -123,7 +125,7 @@ const startServer = async () => {
         process.on('SIGINT', () => shutdown('SIGINT'));
 
     } catch (error) {
-        console.error('❌ Failed to start server:', error);
+        console.error('Failed to start server:', error);
         process.exit(1);
     };
 };
