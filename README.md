@@ -540,7 +540,7 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 
 **Adejare Adedayo**
 - GitHub: [@dprince-03](https://github.com/dprince-03)
-- LinkedIn: [Your LinkedIn Profile]
+- LinkedIn: [https://www.linkedin.com/in/adedayo-adejare/]
 
 ## 🙏 Acknowledgments
 
@@ -550,5 +550,3 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 - Open source community for various dependencies
 
 ---
-
-**Note**: This API is designed for educational and development purposes. For production use, consider additional security measures and monitoring.
